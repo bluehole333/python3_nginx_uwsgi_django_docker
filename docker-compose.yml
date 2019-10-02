@@ -1,0 +1,44 @@
+version: '3'
+services:
+  db:
+    image: mysql:8
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    volumes:
+      - .:/www/webapp
+      - ./data/init-db:/docker-entrypoint-initdb.d
+      - ./data/data-db:/lib/mysql
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: django
+      MYSQL_DATABASE: django
+      MYSQL_USER: django
+      MYSQL_PASSWORD: django
+  nginx:
+    build: ./nginx
+    restart: always
+    ports:
+      # - "8080:80"
+      - "80:80"
+    volumes:
+      - webapp:/webapp
+      - ./nginx/log:/var/log/nginx
+    depends_on:
+      - uwsgi
+    environment:
+      - TZ=Asia/Shanghai
+  uwsgi:
+    build: .
+    restart: always
+    # command: uwsgi  --emperor uwsgi.ini
+    command: sh -c "./wait-for-it.sh db:3306; uwsgi --ini /etc/uwsgi/uwsgi.ini"
+    ports:
+     - "8888:8000"
+    volumes:
+      - .:/var/www/webapps
+    depends_on:
+        - db
+
+volumes:
+  webapp:
+  data:
