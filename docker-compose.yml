@@ -8,36 +8,33 @@ services:
       - ./data/init-db:/docker-entrypoint-initdb.d
       - ./data/data-db:/lib/mysql
     restart: always
-    environment:
-      TZ: Asia/Shanghai
-      MYSQL_ROOT_PASSWORD: django
-      MYSQL_DATABASE: django
-      MYSQL_USER: django
-      MYSQL_PASSWORD: django
+    env_file:
+      - ./env/conf.env
   nginx:
     build: ./nginx
     restart: always
     ports:
-      # - "8080:80"
       - "80:80"
     volumes:
       - webapp:/webapp
       - ./nginx/log:/var/log/nginx
     depends_on:
       - uwsgi
-    environment:
-      - TZ=Asia/Shanghai
+    env_file:
+      - ./env/conf.env
   uwsgi:
     build: .
     restart: always
-    # command: uwsgi  --emperor uwsgi.ini
+    # command: sh -c "./wait-for-it.sh db:3306; uwsgi  --emperor /etc/uwsgi/uwsgi.ini"
     command: sh -c "./wait-for-it.sh db:3306; uwsgi --ini /etc/uwsgi/uwsgi.ini"
     ports:
      - "8888:8000"
     volumes:
-      - .:/var/www/webapps
+      - webapp:/var/www/test
     depends_on:
         - db
+    env_file:
+      - ./env/conf.env
 
 volumes:
   webapp:

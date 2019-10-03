@@ -12,9 +12,11 @@ ADD uwsgi/uwsgi.ini /etc/uwsgi/uwsgi.ini
 RUN adduser --no-create-home --disabled-login --group --system django
 RUN chown -R django:django /var/www/webapp
 
+ADD uwsgi/wait-for-it.sh /var/www/webapp
+
 # Pip install
-#RUN pip install --upgrade pip
+RUN pip install --upgrade pip
 ADD uwsgi/requirements.txt /var/www/webapp
 RUN pip install -i https://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
 
-ADD webapp /var/www/webapp
+#ADD webapp /var/www/webapp
