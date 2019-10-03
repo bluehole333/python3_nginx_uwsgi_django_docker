@@ -30,7 +30,7 @@ services:
     ports:
      - "8888:8000"
     volumes:
-      - webapp:/var/www/test
+      - ./webapp:/var/www/webapp
     depends_on:
         - db
     env_file:
