@@ -35,6 +35,15 @@ services:
         - db
     env_file:
       - ./env/conf.env
+  redis:
+    image: redis
+    container_name: redis
+    restart: always
+    command: --appendonly yes
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis_data:/data
 
 volumes:
   webapp:
